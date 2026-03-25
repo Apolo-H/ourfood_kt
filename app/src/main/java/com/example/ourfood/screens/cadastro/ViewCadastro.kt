@@ -1,4 +1,4 @@
-package com.example.ourfood.screens
+package com.example.ourfood.screens.cadastro
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,23 +15,26 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ourfood.R
+import com.example.ourfood.screens.CadastroViewModel
 import com.example.ourfood.ui.theme.PrimaryBlue
 import com.example.ourfood.ui.theme.WhitePure
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ViewCadastro() {
-    var nome by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var celular by remember { mutableStateOf("") }
-    var senha by remember { mutableStateOf("") }
 
+fun ViewCadastro(viewModel: CadastroViewModel = viewModel()) {
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(viewModel.cadastroSucesso) {
+        if (viewModel.cadastroSucesso) {
+            snackbarHostState.showSnackbar("Oba! Sua conta no OurFood foi criada.")
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -50,83 +53,94 @@ fun ViewCadastro() {
         )
 
         Text(
-            text = ("Registra uma nova Conta"),
+            text = "Registra uma nova Conta",
             fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
-            style = MaterialTheme.typography.headlineLarge,
             color = PrimaryBlue,
             modifier = Modifier.padding(vertical = 16.dp)
         )
 
         // Campo Nome
         OutlinedTextField(
-            value = nome,
-            onValueChange = { nome = it },
+            value = viewModel.nome,
+            onValueChange = { viewModel.nome = it },
             label = { Text("Nome Completo") },
             modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.small
+            shape = MaterialTheme.shapes.medium,
+            singleLine = true
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
         // Campo Email
         OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
+            value = viewModel.email,
+            onValueChange = { viewModel.email = it },
             label = { Text("E-mail") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.small
+            shape = MaterialTheme.shapes.medium,
+            singleLine = true
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // NOVO: Campo Celular
+        // Campo Celular
         OutlinedTextField(
-            value = celular,
-            onValueChange = {
-                // Filtro simples para aceitar apenas números
-                if (it.all { char -> char.isDigit() }) celular = it
-            },
+            value = viewModel.celular,
+            onValueChange = { if (it.all { char -> char.isDigit() }) viewModel.celular = it },
             label = { Text("Celular (DDD + Número)") },
             placeholder = { Text("11999999999") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.small
+            shape = MaterialTheme.shapes.medium,
+            singleLine = true
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
         // Campo Senha
         OutlinedTextField(
-            value = senha,
-            onValueChange = { senha = it },
+            value = viewModel.senha,
+            onValueChange = { viewModel.senha = it },
             label = { Text("Senha") },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.small
+            shape = MaterialTheme.shapes.medium,
+            singleLine = true
         )
+
+        // Exibição de Erro
+        viewModel.mensagemErro?.let {
+            Text(
+                text = it,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Botão Cadastrar
+        // Botão Finalizar
         Button(
-            onClick = { mostrarAlerta = true },
+            onClick = { viewModel.finalizarCadastro() },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
+            enabled = !viewModel.isLoading,
             colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
-            shape = MaterialTheme.shapes.small
+            shape = MaterialTheme.shapes.medium
         ) {
-            Text("Finalizar Cadastro", fontSize = 18.sp)
+            if (viewModel.isLoading) {
+                CircularProgressIndicator(
+                    color = WhitePure, modifier = Modifier.size(24.dp), strokeWidth = 2.dp
+                )
+            } else {
+                Text("Finalizar Cadastro", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+            }
         }
-    }
-}
 
-// O Preview deve ficar FORA da função ViewCadastro
-@Preview(showBackground = true)
-@Composable
-fun CadastroPreview() {
-    ViewCadastro()
+        SnackbarHost(hostState = snackbarHostState)
+    }
 }
