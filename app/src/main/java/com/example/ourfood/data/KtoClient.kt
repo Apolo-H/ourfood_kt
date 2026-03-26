@@ -16,7 +16,6 @@ object KtorClient {
 
     private const val BASE_URL = BuildConfig.API_URL
 
-
     val httpClient = HttpClient(Android) {
 
         install(ContentNegotiation) {

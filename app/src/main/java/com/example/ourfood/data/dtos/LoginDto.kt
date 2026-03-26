@@ -2,12 +2,9 @@ package com.example.ourfood.data.dtos
 
 import kotlinx.serialization.Serializable
 
-
 @Serializable
-data class  Users (
-    val name: String,
+data class LoginDto (
     val email: String,
-    val password: String,
-    val role: String,
-    val telephone: String
+    val password: String
+
 )

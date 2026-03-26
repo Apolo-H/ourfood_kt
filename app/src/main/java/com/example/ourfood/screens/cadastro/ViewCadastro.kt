@@ -2,6 +2,7 @@ package com.example.ourfood.screens.cadastro
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -15,18 +16,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ourfood.R
-import com.example.ourfood.screens.CadastroViewModel
 import com.example.ourfood.ui.theme.PrimaryBlue
 import com.example.ourfood.ui.theme.WhitePure
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.example.ourfood.screens.login.ViewLogin
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 
-fun ViewCadastro(viewModel: CadastroViewModel = viewModel()) {
+fun ViewCadastro(viewModel: ViewModelCadastro = viewModel(), navController: NavController? = null) {
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -66,8 +69,13 @@ fun ViewCadastro(viewModel: CadastroViewModel = viewModel()) {
             onValueChange = { viewModel.nome = it },
             label = { Text("Nome Completo") },
             modifier = Modifier.fillMaxWidth(),
+            textStyle = LocalTextStyle.current.copy(
+                fontSize = 16.sp,
+                lineHeight = 20.sp
+            ),
             shape = MaterialTheme.shapes.medium,
-            singleLine = true
+            singleLine = true,
+            enabled = !viewModel.isLoading
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -79,8 +87,13 @@ fun ViewCadastro(viewModel: CadastroViewModel = viewModel()) {
             label = { Text("E-mail") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth(),
+            textStyle = LocalTextStyle.current.copy(
+                fontSize = 16.sp,
+                lineHeight = 20.sp
+            ),
             shape = MaterialTheme.shapes.medium,
-            singleLine = true
+            singleLine = true,
+            enabled = !viewModel.isLoading
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -93,8 +106,13 @@ fun ViewCadastro(viewModel: CadastroViewModel = viewModel()) {
             placeholder = { Text("11999999999") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth(),
+            textStyle = LocalTextStyle.current.copy(
+                fontSize = 16.sp,
+                lineHeight = 20.sp
+            ),
             shape = MaterialTheme.shapes.medium,
-            singleLine = true
+            singleLine = true,
+            enabled = !viewModel.isLoading
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -107,11 +125,33 @@ fun ViewCadastro(viewModel: CadastroViewModel = viewModel()) {
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             modifier = Modifier.fillMaxWidth(),
+            textStyle = LocalTextStyle.current.copy(
+                fontSize = 16.sp,
+                lineHeight = 20.sp
+            ),
             shape = MaterialTheme.shapes.medium,
-            singleLine = true
+            singleLine = true,
+            enabled = !viewModel.isLoading
         )
 
-        // Exibição de Erro
+        Spacer(modifier = Modifier.height(12.dp))
+
+        OutlinedTextField(
+            value = viewModel.confirmarsenha,
+            onValueChange = { viewModel.confirmarsenha = it },
+            label = { Text("Confirmar Senha") },
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            modifier = Modifier.fillMaxWidth(),
+            textStyle = LocalTextStyle.current.copy(
+                fontSize = 16.sp,
+                lineHeight = 20.sp
+            ),
+            shape = MaterialTheme.shapes.medium,
+            singleLine = true,
+            enabled = !viewModel.isLoading
+        )
+
         viewModel.mensagemErro?.let {
             Text(
                 text = it,
@@ -131,7 +171,8 @@ fun ViewCadastro(viewModel: CadastroViewModel = viewModel()) {
             enabled = !viewModel.isLoading,
             colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
             shape = MaterialTheme.shapes.medium
-        ) {
+        )
+        {
             if (viewModel.isLoading) {
                 CircularProgressIndicator(
                     color = WhitePure, modifier = Modifier.size(24.dp), strokeWidth = 2.dp
@@ -141,6 +182,27 @@ fun ViewCadastro(viewModel: CadastroViewModel = viewModel()) {
             }
         }
 
+        Text(
+            text = "login",
+            color = PrimaryBlue,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .padding(8.dp)
+                .clickable {
+
+                    navController?.navigate("login") {
+                        popUpTo("cadastro") { inclusive = true }
+                    }
+                }
+        )
+
         SnackbarHost(hostState = snackbarHostState)
     }
+}
+
+
+@Preview
+@Composable
+fun PreviewTela() {
+    ViewCadastro()
 }
