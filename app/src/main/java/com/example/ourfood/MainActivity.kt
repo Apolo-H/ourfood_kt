@@ -6,9 +6,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.ourfood.screens.cadastro.ViewCadastro
 import com.example.ourfood.screens.home.ViewHome
 import com.example.ourfood.screens.login.ViewLogin
@@ -25,15 +27,20 @@ fun SetupNavGraph() {
             // O navController deve ser passado AQUI, fora das chaves do onLoginSuccess
             ViewLogin(
                 navController = navController,
-                onLoginSuccess = {
-                    navController.navigate("home") {
+                onLoginSuccess = { token ->
+                    navController.navigate("home/$token") {
                         popUpTo("login") { inclusive = true }
                     }
                 }
             )
         }
-        composable("home") {
-            ViewHome()
+        composable(
+            "home/{token}",
+            arguments = listOf(navArgument("token") {
+                type = NavType.StringType })
+        ) { backStackEntry ->
+            val token = backStackEntry.arguments?.getString("token") ?: ""
+            ViewHome(token = token)
         }
         composable("cadastro") {
             ViewCadastro(
@@ -52,4 +59,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-

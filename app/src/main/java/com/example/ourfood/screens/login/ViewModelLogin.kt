@@ -10,7 +10,8 @@ import com.example.ourfood.data.dtos.LoginDto
 import kotlinx.coroutines.launch
 
 class ViewModelLogin(
-    private val repository: LoginRepository = LoginRepository()
+    private val repository: LoginRepository = LoginRepository(),
+            private val tokenManager: com.example.ourfood.data.local.TokenManager
 ) : ViewModel() {
 
     var email by mutableStateOf("")
@@ -18,16 +19,16 @@ class ViewModelLogin(
     var isLoading by mutableStateOf(false)
     var mensagemErro by mutableStateOf<String?>(null)
     var loginSucesso by mutableStateOf(false)
+    var token by mutableStateOf<String?>(null)
 
 
-    fun finalizarLogin() {
+    fun finalizarLogin(onSuccess: (String) -> Unit) {
 
 
         if (email.isBlank() || password.isBlank()) {
             mensagemErro = "Preencha todos os campos obrigatórios."
             return
         }
-
 
         viewModelScope.launch {
             isLoading = true
@@ -42,8 +43,12 @@ class ViewModelLogin(
             val result = repository.loginRepository(loginDto)
 
             if (result.isSuccess) {
+                val receivedToken = result.getOrNull() ?: ""
+                tokenManager.saveToken(receivedToken)
+                token = receivedToken
                 loginSucesso = true
                 mensagemErro = "Login realizado com sucesso!"
+                onSuccess(receivedToken)
             } else {
                 loginSucesso = false
 
@@ -60,5 +65,3 @@ class ViewModelLogin(
 
     }
 }
-
-

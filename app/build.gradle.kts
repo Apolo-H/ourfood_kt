@@ -1,5 +1,11 @@
+
+
+
 val ktor_version: String by project
+
+
 val apiUrl: String by project
+
 
 
 
@@ -27,6 +33,8 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "API_URL", apiUrl)
     }
+
+
 
     buildTypes {
         release {
@@ -71,5 +79,14 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:${ktor_version}")
     implementation("io.ktor:ktor-serialization-kotlinx-json:${ktor_version}")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
+    implementation("androidx.compose.material:material-icons-extended:1.6.3")
+    implementation("androidx.compose.material3:material3:1.4.0")
+    implementation("androidx.compose.foundation:foundation:1.6.3")
+    implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation("androidx.datastore:datastore:1.2.1")
+    implementation("androidx.datastore:datastore-preferences:1.2.1")
+    implementation("io.ktor:ktor-client-core:${ktor_version}")
+    implementation("io.ktor:ktor-client-auth:${ktor_version}")
+    implementation("io.ktor:ktor-client-android:${ktor_version}")
 
 }

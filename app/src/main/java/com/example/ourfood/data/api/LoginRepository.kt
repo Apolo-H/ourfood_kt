@@ -2,19 +2,23 @@ package com.example.ourfood.data.api
 
 import com.example.ourfood.data.KtorClient
 import com.example.ourfood.data.dtos.LoginDto
+import com.example.ourfood.data.dtos.LoginResponseDto
+import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.isSuccess
 
 class LoginRepository {
     private val client = KtorClient.httpClient
-    suspend fun loginRepository(loginDto: LoginDto): Result<Unit> {
+
+    suspend fun loginRepository(loginDto: LoginDto): Result<String> {
         return try {
             val response = client.post("/auth/login") {
                 setBody(loginDto)
             }
             if (response.status.isSuccess()) {
-                Result.success(Unit)
+                val loginResponse = response.body<LoginResponseDto>()
+                Result.success(loginResponse.token)
             } else {
                 Result.failure(Exception("Erro no servidor: ${response.status.value}"))
             }

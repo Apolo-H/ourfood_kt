@@ -1,6 +1,5 @@
 package com.example.ourfood.screens.login
 
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -39,17 +39,22 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.ourfood.R
+import com.example.ourfood.ViewModelLoginFactory
 import com.example.ourfood.ui.theme.LightGray
 import com.example.ourfood.ui.theme.PrimaryBlue
 import com.example.ourfood.ui.theme.WhitePure
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ViewLogin(viewModel: ViewModelLogin = viewModel(), onLoginSuccess: () -> Unit = {}, navController: NavController? = null) {
+fun ViewLogin(
+    onLoginSuccess: (String) -> Unit = {},
+    navController: NavController? = null,
+    viewModel: ViewModelLogin = viewModel(factory = ViewModelLoginFactory(LocalContext.current))
+) {
 
     LaunchedEffect(viewModel.loginSucesso) {
         if (viewModel.loginSucesso) {
-            onLoginSuccess()
+            viewModel.token?.let { onLoginSuccess(it) }
         }
     }
 
@@ -125,7 +130,11 @@ fun ViewLogin(viewModel: ViewModelLogin = viewModel(), onLoginSuccess: () -> Uni
 
 
         Button(
-            onClick = { viewModel.finalizarLogin() },
+            onClick = {
+                viewModel.finalizarLogin { token ->
+                    onLoginSuccess(token)
+                }
+            },
             modifier = Modifier
                 .width(250.dp)
                 .height(60.dp),
@@ -151,7 +160,6 @@ fun ViewLogin(viewModel: ViewModelLogin = viewModel(), onLoginSuccess: () -> Uni
             modifier = Modifier
                 .padding(8.dp)
                 .clickable {
-
                     navController?.navigate("cadastro") {
                         popUpTo("login") { inclusive = true }
                     }
